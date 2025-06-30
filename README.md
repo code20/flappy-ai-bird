@@ -5,7 +5,7 @@ No manual code. Just creativity, curiosity, and a co-pilot.
 
 ---
 
-[▶️ Play the game now](https://github.com/code20/flappy-ai-bird)) 
+[▶️ Play the game now](https://code20.github.io/flappy-ai-bird/)
 
 ## 💡 What Is This?
 
