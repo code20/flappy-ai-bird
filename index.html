@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy Ai Bird</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="gameContainer">
+    <canvas id="gameCanvas" width="960" height="600" tabindex="0"></canvas>
+    <div id="ui">
+      <div id="startScreen">
+        <div class="title">Flappy Ai Bird</div>
+        <div class="instructions">Press <b>Space</b> or <b>Click/Tap</b> to jump</div>
+        <div class="bestScore">BEST: <span id="bestScoreDisplay">0</span></div>
+        <button id="startBtn" aria-label="Start Game">Start</button>
+      </div>
+      <div id="score" style="display:none;" aria-live="polite">0</div>
+      <div id="gameOver" style="display:none;" role="dialog" aria-labelledby="gameOverTitle">
+        <div id="gameOverTitle">GAME OVER</div>
+        <div id="finalScore" aria-live="assertive"></div>
+        <button id="restartBtn" aria-label="Restart Game">Restart</button>
+      </div>
+      <div id="hearts"></div>
+      <button id="pauseBtn" aria-label="Pause Game" style="display:none;">⏸️</button>
+    </div>
+  </div>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
