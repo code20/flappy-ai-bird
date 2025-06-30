@@ -3,7 +3,7 @@
 An AI-coded tribute to Flappy Bird—playful, browser-ready, and built entirely through natural language prompts using GitHub Copilot in Visual Studio Code.  
 No manual code. Just creativity, curiosity, and a co-pilot.
 
-![Gameplay Preview](assets/screenshot.png)
+![Gameplay Preview](assets/screenshot.jpg)
 
 ---
 
