@@ -61,7 +61,7 @@ The result: a polished take on Flappy Bird with animations, custom mechanics, an
 - 🛠️ Push Copilot into designing, fixing, and iterating on features
 - 📖 Open-source the journey so others can follow, remix, or build on it
 
-You can view all instructions and prompts used in [`PROMPTS.md`](PROMPTS.md).
+You can view all instructions and prompts used in [`PROMPTS.md`](docs/PROMPTS.md).
 
 ---
 
