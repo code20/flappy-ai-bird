@@ -22,23 +22,27 @@ body {
 }
 
 #gameContainer {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 100%;
-  max-height: 100vh;
 }
 
 #gameCanvas {
-  border: 4px solid #fff;
-  background: linear-gradient(to bottom, #4fd1ff, #a8ffea);
-  border-radius: 8px;
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
-  width: 100%;
-  max-width: 960px;
-  max-height: 600px;
-  aspect-ratio: 960/600;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  aspect-ratio: unset;
 }
 
 #ui {

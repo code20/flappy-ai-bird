@@ -9,20 +9,12 @@ import { createParticle, updateParticles, drawParticles } from './gameFunctions/
 
 let canvas, ctx;
 
-// Game constants
-const GRAVITY = 0.4;
-const JUMP = -7.5;
-const PIPE_WIDTH = 80;
-const BASE_PIPE_GAP = 160;
-const MIN_PIPE_GAP = 120;
-const BASE_PIPE_SPEED = 3.5;
-const MAX_PIPE_SPEED = 6.5;
-const BIRD_SIZE = 34;
-const PIPE_INTERVAL = 100; 
+// Game constants (will be set dynamically)
+let GRAVITY, JUMP, PIPE_WIDTH, BASE_PIPE_GAP, MIN_PIPE_GAP, BASE_PIPE_SPEED, MAX_PIPE_SPEED, BIRD_SIZE, PIPE_INTERVAL;
 const BIRD_COLORS = ['#FF8C00', '#FFD700', '#FF6347', '#00BFFF'];
+const DIFFICULTY_SCORE_INTERVAL = 5;
 const STATUE_CHANCE = 0.2;
-const DIFFICULTY_SCORE_INTERVAL = 5; 
-const JUMP_COOLDOWN = 100; 
+const JUMP_COOLDOWN = 100;
 
 // Cloud settings
 const CLOUDS = [
@@ -60,8 +52,6 @@ function showStartScreen() {
 function hideStartScreen() {
   const startScreen = document.getElementById('startScreen');
   if (startScreen) startScreen.style.display = 'none';
-  const ui = document.getElementById('ui');
-  if (ui) ui.style.pointerEvents = 'none';
 }
 
 function showGameOver() {
@@ -101,26 +91,33 @@ function hideHearts() {
 
 // Responsive canvas setup
 function resizeCanvas() {
-  const gameContainer = document.getElementById('gameContainer');
-  if (!gameContainer || !canvas) return;
-  
-  const containerWidth = gameContainer.clientWidth;
-  const containerHeight = window.innerHeight * 0.8;
-  const aspectRatio = 960 / 600;
-  
-  let newWidth = containerWidth;
-  let newHeight = containerWidth / aspectRatio;
-  
-  if (newHeight > containerHeight) {
-    newHeight = containerHeight;
-    newWidth = containerHeight * aspectRatio;
-  }
-  
-  canvas.width = newWidth;
-  canvas.height = newHeight;
-  groundY = canvas.height - 100; 
-  
+  if (!canvas) return;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  groundY = canvas.height - 100;
+
+  // Reference design size
+  const BASE_HEIGHT = 600;
+  const BASE_WIDTH = 960;
+  const heightScale = canvas.height / BASE_HEIGHT;
+  const widthScale = canvas.width / BASE_WIDTH;
+
+  // Only scale visual elements
+  BIRD_SIZE = Math.max(24, Math.round(34 * heightScale));
+  PIPE_WIDTH = Math.max(60, Math.round(80 * widthScale));
+  BASE_PIPE_GAP = Math.round(160 * heightScale);
+  MIN_PIPE_GAP = Math.round(120 * heightScale);
+  PIPE_INTERVAL = Math.round(100 * widthScale);
+
+  // Physics constants: keep original values
+  GRAVITY = 0.4;
+  JUMP = -7.5;
+  BASE_PIPE_SPEED = 3.5;
+  MAX_PIPE_SPEED = 6.5;
+
   if (bird) {
+    bird.w = BIRD_SIZE;
+    bird.h = BIRD_SIZE;
     draw();
   }
 }
@@ -170,6 +167,7 @@ function resetGame() {
 
 // Helper: Reset all game state variables to safe defaults
 function resetGameStateVars() {
+  started = false;
   bird = undefined;
   pipes = [];
   score = undefined;
@@ -353,7 +351,6 @@ function update() {
 }
 
 function jump() {
-  console.log("Jump called");
   if (!started || gameOver || paused) return;
   const now = Date.now();
   if (now - lastJumpTime < JUMP_COOLDOWN) return;
@@ -419,10 +416,22 @@ function togglePause() {
   }
 }
 
-function loop() {
-  update();
+// Fixed timestep game loop
+let lastFrameTime = 0;
+let accumulator = 0;
+const FIXED_TIMESTEP = 1000 / 60; // 60 FPS
+
+function loop(now) {
+  if (!now) now = performance.now();
+  accumulator += now - lastFrameTime;
+  lastFrameTime = now;
+
+  while (accumulator >= FIXED_TIMESTEP) {
+    update();
+    accumulator -= FIXED_TIMESTEP;
+  }
   draw();
-  
+
   if (!gameOver && !paused) {
     requestAnimationFrame(loop);
   } else if (gameOver) {
@@ -444,10 +453,12 @@ function startGame() {
   hideStartScreen();
   showHearts();
   showPauseBtn();
-  
+
   // Start game loop
+  lastFrameTime = performance.now();
+  accumulator = 0;
   requestAnimationFrame(loop);
-  
+
   // Focus canvas for keyboard controls
   if (canvas) canvas.focus();
 }
@@ -457,27 +468,54 @@ window.addEventListener('DOMContentLoaded', () => {
   // Initialize canvas
   canvas = document.getElementById('gameCanvas');
   ctx = canvas.getContext('2d');
-  
+
+  // Set initial canvas size and game constants FIRST
+  resizeCanvas();
+
   // Initialize game state
   resetGameStateVars();
-  
+
   // Load best score
   const savedScore = localStorage.getItem('flappyBestScore');
   bestScore = savedScore ? parseInt(savedScore) : 0;
   updateBestScore(bestScore);
-  
-  // Setup controls
-  setupControls(startGame, jump, togglePause, canvas);
-  
-  // Set initial canvas size
-  resizeCanvas();
 
-  // Re-attach controls after resizing canvas
+  // Setup controls (only once)
+  console.log('Calling setupControls', { startGame, jump, togglePause, canvas });
   setupControls(startGame, jump, togglePause, canvas);
-  
+
+  // Add mouse, touch, pointer, and click support for jump
+  canvas.addEventListener('mousedown', jump);
+  canvas.addEventListener('touchstart', function(e) { 
+    e.preventDefault(); jump(); 
+  }, { passive: false });
+  canvas.addEventListener('pointerdown', function(e) { 
+    e.preventDefault(); 
+    jump(); 
+  }, { passive: false });
+  canvas.addEventListener('click', function(e) {
+    jump();
+  });
+  document.addEventListener('touchstart', function(e) {
+    if (e.target === canvas) { e.preventDefault(); jump(); }
+  }, { passive: false });
+  document.addEventListener('pointerdown', function(e) {
+    e.preventDefault();
+    jump();
+  }, { passive: false });
+  document.addEventListener('click', function(e) {
+    if (e.target === canvas) jump();
+  });
+
+  // Attach Start button click event
+  const startBtn = document.getElementById('startBtn');
+  if (startBtn) {
+    startBtn.onclick = startGame;
+  }
+
   // Show start screen
   showStartScreen();
-  
+
   // Draw initial frame
   draw();
 });
