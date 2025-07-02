@@ -5,7 +5,7 @@ No manual code. Just creativity, curiosity, and a co-pilot.
 
 > 📝 Even this README and the [`PROMPTS.md`](docs/PROMPTS.md) file were created using Copilot—guided by prompts, not typing.
 
-![Screenshot of Flappy Ai Bird gameplay showing bird, pipes, and score](assets/screenshot.jpg)
+![Screenshot of Flappy Ai Bird gameplay showing bird, pipes, and score](assets/screenshot.jpeg)
 
 ---
 
