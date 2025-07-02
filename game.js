@@ -1,7 +1,7 @@
 // Import modules
 import { setupControls } from './gameFunctions/controls.js';
 import { drawBird } from './gameFunctions/bird.js';
-import { drawPipe } from './gameFunctions/pipes.js';
+import { drawPipes } from './gameFunctions/pipes.js';
 import { drawParallax, updateParallax, drawCloud, updateClouds } from './gameFunctions/parallax.js';
 import { sounds, unlockAudio } from './gameFunctions/sound.js';
 import { updateHearts, updateBestScore, updateDifficulty } from './gameFunctions/state.js';
@@ -136,11 +136,18 @@ function resetGame() {
     wingState: 0,
     wingDirection: 1
   };
-  
   pipes = [];
+  // Add a pipe immediately at game start
+  const top = Math.floor(Math.random() * (groundY - BASE_PIPE_GAP - 100)) + 50;
+  pipes.push({
+    x: canvas.width,
+    top,
+    passed: false,
+    isStatue: false
+  });
   score = 0;
   gameOver = false;
-  frame = 0;
+  frame = 1; // Prevent immediate duplicate pipe
   birdFrame = 0;
   particles = [];
   lives = 3;
@@ -148,17 +155,14 @@ function resetGame() {
   currentPipeGap = BASE_PIPE_GAP;
   currentPipeSpeed = BASE_PIPE_SPEED;
   lastJumpTime = 0;
-  
   hideGameOver();
   updateHearts(lives);
   updateBestScore(bestScore);
-
   // Reset parallax layer offsets
   for (let i = 0; i < 3; i++) {
     const layer = parallaxLayers[i];
     layer.offset = 0;
     layer.hedgeHeights = [];
-    
     for (let j = 0; j < 50; j++) {
       layer.hedgeHeights[j] = 10 + Math.random() * 15;
     }
@@ -203,7 +207,7 @@ function draw() {
   for (let cloud of CLOUDS) drawCloud(ctx, cloud);
   
   if (bird) {
-    for (let pipe of pipes) drawPipe(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas, groundY);
+    for (let pipe of pipes) drawPipes(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas, groundY);
     drawBird(ctx, bird, frame || 0, BIRD_SIZE);
     drawParticles(ctx, particles);
   } else {
@@ -248,12 +252,19 @@ function draw() {
 function update() {
   if (!started || gameOver || paused || !bird) return;
   
-  // Update difficulty
-  const diff = updateDifficulty(score, BASE_PIPE_SPEED, MAX_PIPE_SPEED, 
-                               BASE_PIPE_GAP, MIN_PIPE_GAP, DIFFICULTY_SCORE_INTERVAL);
-  currentPipeSpeed = diff.currentPipeSpeed;
-  currentPipeGap = diff.currentPipeGap;
-  
+  // Progressive pipe gap reduction for difficulty
+  // Every DIFFICULTY_SCORE_INTERVAL points, reduce gap by 10px, but never below MIN_PIPE_GAP
+  currentPipeGap = Math.max(
+    MIN_PIPE_GAP,
+    BASE_PIPE_GAP - Math.floor(score / DIFFICULTY_SCORE_INTERVAL) * 10
+  );
+
+  // Optionally, you can also increase pipe speed here for more challenge:
+  // currentPipeSpeed = Math.min(
+  //   MAX_PIPE_SPEED,
+  //   BASE_PIPE_SPEED + Math.floor(score / DIFFICULTY_SCORE_INTERVAL) * 0.2
+  // );
+
   // Apply physics
   bird.vy += GRAVITY;
   bird.y += bird.vy;
@@ -289,12 +300,15 @@ function update() {
   if (frame % PIPE_INTERVAL === 0) {
     const top = Math.floor(Math.random() * (groundY - currentPipeGap - 100)) + 50;
     const isStatue = Math.random() < STATUE_CHANCE;
-    
+    // Randomly pick a color for the pipe (green, blue, gray, orange)
+    const pipeColors = ['green', 'blue', 'gray', 'orange'];
+    const color = pipeColors[Math.floor(Math.random() * pipeColors.length)];
     pipes.push({ 
       x: canvas.width, 
       top, 
       passed: false,
-      isStatue
+      isStatue,
+      color: isStatue ? undefined : color // statues remain default
     });
   }
   

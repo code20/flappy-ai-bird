@@ -1,141 +1,148 @@
 // Pipes module for Flappy Retro
-// Handles drawing of pipes and broken statues
+// Handles drawing of pipes
 
-export function drawPipe(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas, groundY) {
+// Pipe color palettes for 3D effect
+const PIPE_COLORS = {
+  green: {
+    main: '#4ec24e', shadow: '#267326', highlight: '#a8ffb0', rim: '#2e8b2e', inner: '#145214', shadowRGBA: 'rgba(46, 139, 46, 0.18)'
+  },
+  blue: {
+    main: '#3a8dde', shadow: '#1a3a5c', highlight: '#b3e6ff', rim: '#235a8c', inner: '#15304a', shadowRGBA: 'rgba(58, 141, 222, 0.18)'
+  },
+  gray: {
+    main: '#6e6e6e', shadow: '#232323', highlight: '#d6d6d6', rim: '#444444', inner: '#181818', shadowRGBA: 'rgba(70, 70, 70, 0.18)'
+  },
+  orange: {
+    main: '#ff9c2a', shadow: '#a85a00', highlight: '#ffe0b3', rim: '#c97a1c', inner: '#7a3d00', shadowRGBA: 'rgba(255, 156, 42, 0.18)'
+  }
+};
+
+export function drawPipes(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas, groundY) {
+  // Only draw pipes, ignore statues
   if (pipe.isStatue) {
-    drawBrokenStatue(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas);
     return;
   }
 
+  // Pick color set (default to green if not set)
+  const colorKey = pipe.color || 'green';
+  const colors = PIPE_COLORS[colorKey] || PIPE_COLORS.green;
+
   const pipeTopHeight = pipe.top;
   const pipeBottomY = pipe.top + currentPipeGap;
+  const pipeEndMargin = 8; // Margin for pipe ends
 
-  // Even creamier pillar colors
-  const pillarMain = '#fff7e6'; 
-  const pillarShadow = '#f5e6c8'; 
-  const pillarHighlight = '#fffbe6'; 
-  const pillarCap = '#f9efd2'; 
-  const pillarBand = '#e8d7b8'; 
-
+  // --- Top Pipe ---
   ctx.save();
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.13)';
-  ctx.shadowBlur = 8;
-  ctx.shadowOffsetX = 2;
-  ctx.shadowOffsetY = 2;
-
-  // Top pillar cap
-  ctx.fillStyle = pillarCap;
-  ctx.fillRect(pipe.x - 7, pipeTopHeight - 18, PIPE_WIDTH + 14, 18);
-  ctx.strokeStyle = pillarBand;
-  ctx.lineWidth = 2;
-  ctx.strokeRect(pipe.x - 7, pipeTopHeight - 18, PIPE_WIDTH + 14, 18);
-
-  // Top pillar body (vertical gradient)
-  let grad = ctx.createLinearGradient(pipe.x, 0, pipe.x + PIPE_WIDTH, 0);
-  grad.addColorStop(0, pillarHighlight);
-  grad.addColorStop(0.5, pillarMain);
-  grad.addColorStop(1, pillarShadow);
-  ctx.fillStyle = grad;
-  ctx.fillRect(pipe.x, 0, PIPE_WIDTH, pipeTopHeight - 18);
-
-  // Top pillar bands
-  for (let i = 1; i < 4; i++) {
-    const y = pipeTopHeight - 18 - i * 22;
-    if (y > 10) {
-      ctx.strokeStyle = pillarBand;
-      ctx.beginPath();
-      ctx.moveTo(pipe.x, y);
-      ctx.lineTo(pipe.x + PIPE_WIDTH, y);
-      ctx.stroke();
-    }
-  }
-
-  // Fluting (vertical lines)
-  ctx.strokeStyle = pillarBand;
-  for (let i = 1; i < 5; i++) {
-    ctx.beginPath();
-    ctx.moveTo(pipe.x + (PIPE_WIDTH/5)*i, 0);
-    ctx.lineTo(pipe.x + (PIPE_WIDTH/5)*i, pipeTopHeight - 18);
-    ctx.stroke();
-  }
-
-  // Bottom pillar cap
-  ctx.fillStyle = pillarCap;
-  ctx.fillRect(pipe.x - 7, pipeBottomY, PIPE_WIDTH + 14, 18);
-  ctx.strokeStyle = pillarBand;
-  ctx.strokeRect(pipe.x - 7, pipeBottomY, PIPE_WIDTH + 14, 18);
-
-  // Bottom pillar body
-  grad = ctx.createLinearGradient(pipe.x, pipeBottomY + 18, pipe.x + PIPE_WIDTH, canvas.height);
-  grad.addColorStop(0, pillarHighlight);
-  grad.addColorStop(0.5, pillarMain);
-  grad.addColorStop(1, pillarShadow);
-  ctx.fillStyle = grad;
-  ctx.fillRect(pipe.x, pipeBottomY + 18, PIPE_WIDTH, canvas.height - pipeBottomY - 18);
-
-  // Bottom pillar bands
-  for (let i = 1; i < 4; i++) {
-    const y = pipeBottomY + 18 + i * 22;
-    if (y < canvas.height - 20) {
-      ctx.strokeStyle = pillarBand;
-      ctx.beginPath();
-      ctx.moveTo(pipe.x, y);
-      ctx.lineTo(pipe.x + PIPE_WIDTH, y);
-      ctx.stroke();
-    }
-  }
-
-  // Fluting (vertical lines)
-  ctx.strokeStyle = pillarBand;
-  for (let i = 1; i < 5; i++) {
-    ctx.beginPath();
-    ctx.moveTo(pipe.x + (PIPE_WIDTH/5)*i, pipeBottomY + 18);
-    ctx.lineTo(pipe.x + (PIPE_WIDTH/5)*i, canvas.height);
-    ctx.stroke();
-  }
-
-  ctx.restore();
-}
-
-export function drawBrokenStatue(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas) {
-  const statueHeight = 120;
-  const baseY = pipe.top + currentPipeGap;
-
-  ctx.save();
-
-  // Draw base
-  ctx.fillStyle = '#d7ccc8';
-  ctx.fillRect(pipe.x, baseY, PIPE_WIDTH, canvas.height - baseY);
-
-  // Draw broken statue pieces
-  ctx.fillStyle = '#bcaaa4';
-
-  // Base platform
-  ctx.fillRect(pipe.x - 10, baseY - 10, PIPE_WIDTH + 20, 10);
-
-  // Broken pillar base
-  ctx.fillRect(pipe.x + 20, baseY - 60, 40, 50);
-
-  // Fallen pillar top
-  ctx.save();
-  ctx.translate(pipe.x + 40, baseY - 30);
-  ctx.rotate(-0.3);
-  ctx.fillRect(0, 0, 60, 20);
-  ctx.restore();
-
-  // Statue fragments
-  ctx.fillStyle = '#8d6e63';
-
-  // Head
   ctx.beginPath();
-  ctx.arc(pipe.x + 40, baseY - 100, 15, 0, Math.PI * 2);
+  ctx.rect(pipe.x, 0, PIPE_WIDTH, pipeTopHeight - 18 - pipeEndMargin);
+  ctx.clip();
+  ctx.shadowColor = colors.shadowRGBA;
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetX = 4;
+  ctx.shadowOffsetY = 4;
+
+  // Draw main body (cylinder)
+  let grad = ctx.createLinearGradient(pipe.x, 0, pipe.x + PIPE_WIDTH, 0);
+  grad.addColorStop(0, colors.highlight);
+  grad.addColorStop(0.18, colors.main);
+  grad.addColorStop(0.5, colors.shadow);
+  grad.addColorStop(0.82, colors.main);
+  grad.addColorStop(1, colors.highlight);
+  ctx.fillStyle = grad;
+  ctx.fillRect(pipe.x, 0, PIPE_WIDTH, pipeTopHeight - 18 - pipeEndMargin);
+
+  // Subtle vertical shine (only in top pipe)
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(pipe.x + PIPE_WIDTH * 0.18, 0, PIPE_WIDTH * 0.13, pipeTopHeight - 18 - pipeEndMargin);
+  ctx.restore();
+
+  ctx.restore(); // End top pipe
+
+  // Draw rim (ellipse for 3D effect) just outside the clipped region
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(pipe.x + PIPE_WIDTH/2, pipeTopHeight - 18 - pipeEndMargin, PIPE_WIDTH/2 + 6, 10, 0, 0, Math.PI * 2);
+  ctx.fillStyle = colors.rim;
+  ctx.shadowColor = colors.shadowRGBA;
+  ctx.shadowBlur = 6;
   ctx.fill();
+  ctx.restore();
 
-  // Arm
-  ctx.fillRect(pipe.x + 10, baseY - 85, 30, 10);
+  // Draw inner ellipse (darker for depth)
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(pipe.x + PIPE_WIDTH/2, pipeTopHeight - 18 - pipeEndMargin, PIPE_WIDTH/2 - 6, 6, 0, 0, Math.PI * 2);
+  ctx.fillStyle = colors.inner;
+  ctx.globalAlpha = 0.5;
+  ctx.fill();
+  ctx.restore();
 
-  // Torso
-  ctx.fillRect(pipe.x + 25, baseY - 70, 30, 40);
+  // Top rim highlight
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(pipe.x + PIPE_WIDTH/2, pipeTopHeight - 22 - pipeEndMargin, PIPE_WIDTH/2 - 10, 2, 0, 0, Math.PI);
+  ctx.strokeStyle = colors.highlight;
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = 0.7;
+  ctx.stroke();
+  ctx.restore();
 
+  // --- Bottom Pipe ---
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(pipe.x, pipeBottomY + 18 + pipeEndMargin, PIPE_WIDTH, canvas.height - pipeBottomY - 18 - pipeEndMargin);
+  ctx.clip();
+  ctx.shadowColor = colors.shadowRGBA;
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetX = 4;
+  ctx.shadowOffsetY = 4;
+
+  grad = ctx.createLinearGradient(pipe.x, pipeBottomY + 18 + pipeEndMargin, pipe.x + PIPE_WIDTH, canvas.height);
+  grad.addColorStop(0, colors.highlight);
+  grad.addColorStop(0.18, colors.main);
+  grad.addColorStop(0.5, colors.shadow);
+  grad.addColorStop(0.82, colors.main);
+  grad.addColorStop(1, colors.highlight);
+  ctx.fillStyle = grad;
+  ctx.fillRect(pipe.x, pipeBottomY + 18 + pipeEndMargin, PIPE_WIDTH, canvas.height - pipeBottomY - 18 - pipeEndMargin);
+
+  // Subtle vertical shine (only in bottom pipe)
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(pipe.x + PIPE_WIDTH * 0.18, pipeBottomY + 18 + pipeEndMargin, PIPE_WIDTH * 0.13, canvas.height - pipeBottomY - 18 - pipeEndMargin);
+  ctx.restore();
+
+  ctx.restore(); // End bottom pipe
+
+  // Draw rim (ellipse for 3D effect) just outside the clipped region
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(pipe.x + PIPE_WIDTH/2, pipeBottomY + 18 + pipeEndMargin, PIPE_WIDTH/2 + 6, 10, 0, 0, Math.PI * 2);
+  ctx.fillStyle = colors.rim;
+  ctx.shadowColor = colors.shadowRGBA;
+  ctx.shadowBlur = 6;
+  ctx.fill();
+  ctx.restore();
+
+  // Draw inner ellipse (darker for depth)
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(pipe.x + PIPE_WIDTH/2, pipeBottomY + 18 + pipeEndMargin, PIPE_WIDTH/2 - 6, 6, 0, 0, Math.PI * 2);
+  ctx.fillStyle = colors.inner;
+  ctx.globalAlpha = 0.5;
+  ctx.fill();
+  ctx.restore();
+
+  // Bottom rim highlight
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(pipe.x + PIPE_WIDTH/2, pipeBottomY + 22 + pipeEndMargin, PIPE_WIDTH/2 - 10, 2, 0, 0, Math.PI);
+  ctx.strokeStyle = colors.highlight;
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = 0.7;
+  ctx.stroke();
   ctx.restore();
 }

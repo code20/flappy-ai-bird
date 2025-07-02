@@ -1,4 +1,3 @@
-
 export function drawParallax(ctx, canvas, parallaxLayers, groundY) {
   // Draw sky gradient
   const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -12,7 +11,7 @@ export function drawParallax(ctx, canvas, parallaxLayers, groundY) {
   ctx.fillStyle = cityLayer.color;
   for (let i = -1; i < 2; i++) {
     const x = cityLayer.offset + i * canvas.width;
-    drawCitySilhouette(ctx, x, groundY - cityLayer.height, cityLayer.height);
+    drawCitySilhouette(ctx, x, groundY - cityLayer.height * 2, cityLayer.height * 2); // 30% smaller than 2.8x
   }
 
   // Draw ground layers
@@ -35,22 +34,23 @@ export function drawParallax(ctx, canvas, parallaxLayers, groundY) {
 export function drawCitySilhouette(ctx, x, y, height) {
   ctx.save();
   ctx.fillStyle = '#34495e';
+  const scale = 2; // 30% smaller than 2.8x
   const buildings = [
-    { x: 0, width: 30, height: height * 0.8 },
-    { x: 40, width: 25, height: height * 0.6 },
-    { x: 75, width: 40, height: height * 0.9 },
-    { x: 125, width: 35, height: height * 0.7 },
-    { x: 170, width: 30, height: height * 0.5 },
-    { x: 210, width: 45, height: height }
+    { x: 0, width: 30 * scale, height: height * 0.8 },
+    { x: 40 * scale, width: 25 * scale, height: height * 0.6 },
+    { x: 75 * scale, width: 40 * scale, height: height * 0.9 },
+    { x: 125 * scale, width: 35 * scale, height: height * 0.7 },
+    { x: 170 * scale, width: 30 * scale, height: height * 0.5 },
+    { x: 210 * scale, width: 45 * scale, height: height }
   ];
   for (const building of buildings) {
     ctx.fillRect(x + building.x, y + (height - building.height), building.width, building.height);
     ctx.fillStyle = '#f1c40f';
-    const windowWidth = 5;
-    const windowHeight = 8;
-    const spacing = 8;
-    for (let wy = y + height - building.height + 10; wy < y + height - 5; wy += windowHeight + 5) {
-      for (let wx = x + building.x + 5; wx < x + building.x + building.width - windowWidth; wx += windowWidth + spacing) {
+    const windowWidth = 5 * scale;
+    const windowHeight = 8 * scale;
+    const spacing = 8 * scale;
+    for (let wy = y + height - building.height + 10 * scale; wy < y + height - 5 * scale; wy += windowHeight + 5 * scale) {
+      for (let wx = x + building.x + 5 * scale; wx < x + building.x + building.width - windowWidth; wx += windowWidth + spacing) {
         ctx.fillRect(wx, wy, windowWidth, windowHeight);
       }
     }
@@ -60,8 +60,13 @@ export function drawCitySilhouette(ctx, x, y, height) {
 }
 
 export function updateParallax(parallaxLayers, canvas) {
-  for (let layer of parallaxLayers) {
-    layer.offset = (layer.offset - layer.speed) % canvas.width;
+  for (let i = 0; i < parallaxLayers.length; i++) {
+    // Make city layer (index 3) move faster
+    if (i === 3) {
+      parallaxLayers[i].offset = (parallaxLayers[i].offset - parallaxLayers[i].speed * 3.0) % canvas.width; // 20% faster than 2.5
+    } else {
+      parallaxLayers[i].offset = (parallaxLayers[i].offset - parallaxLayers[i].speed * 1.8) % canvas.width; // 20% faster than 1.5
+    }
   }
 }
 
