@@ -4,7 +4,7 @@ import { drawBird } from './gameFunctions/bird.js';
 import { drawPipes } from './gameFunctions/pipes.js';
 import { drawParallax, updateParallax, drawCloud, updateClouds } from './gameFunctions/parallax.js';
 import { sounds, unlockAudio } from './gameFunctions/sound.js';
-import { updateBestScore, updateDifficulty } from './gameFunctions/state.js';
+import { updateBestScore } from './gameFunctions/state.js';
 import { createParticle, updateParticles, drawParticles } from './gameFunctions/particles.js';
 
 let canvas, ctx;
@@ -512,7 +512,6 @@ function loop(now) {
 }
 
 function startGame() {
-  console.log("Start button pressed");
   unlockAudio();
   started = true;
   resetGame();
@@ -560,7 +559,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // Setup controls (only once)
-  console.log('Calling setupControls', { startGame, jump, togglePause, canvas });
   setupControls(startGame, jump, togglePause, canvas);
 
   // Add mouse, touch, pointer, and click support for jump

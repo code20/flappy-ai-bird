@@ -2,7 +2,6 @@
 let controlsInitialized = false;
 
 function handleCanvasClick() {
-  console.log("Canvas clicked");
   window._flappyJump && window._flappyJump();
 }
 function handleCanvasTouch(e) {
@@ -19,13 +18,9 @@ export function setupControls(startGame, jump, togglePause, canvas) {
     const startBtn = document.getElementById('startBtn');
     const restartBtn = document.getElementById('restartBtn');
     
-    console.log("startBtn found:", !!startBtn);
-    console.log("restartBtn found:", !!restartBtn);
-    
     // Only attach to start and restart buttons here
     // Pause and mute buttons are handled in game.js
     if (startBtn) startBtn.addEventListener('click', function() {
-      console.log("StartBtn click event fired");
       startGame();
     });
     if (restartBtn) restartBtn.addEventListener('click', startGame);
