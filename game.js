@@ -426,12 +426,7 @@ function loseLife() {
 
 function togglePause() {
   paused = !paused;
-  const pauseBtn = document.getElementById('pauseBtn');
-  if (pauseBtn) {
-    pauseBtn.textContent = paused ? '▶️' : '⏸️';
-    pauseBtn.setAttribute('aria-pressed', paused.toString());
-    pauseBtn.setAttribute('aria-label', paused ? 'Resume Game' : 'Pause Game');
-  }
+  updatePauseBtnIcon();
   if (!paused && !gameOver) {
     lastFrameTime = performance.now();
     accumulator = 0;
@@ -439,15 +434,20 @@ function togglePause() {
   }
 }
 
-// Mute toggle function
+function updatePauseBtnIcon() {
+  const pauseBtn = document.getElementById('pauseBtn');
+  if (pauseBtn) {
+    pauseBtn.innerHTML = paused
+      ? '<i class="fas fa-play"></i>'
+      : '<i class="fas fa-pause"></i>';
+    pauseBtn.setAttribute('aria-label', paused ? 'Resume Game' : 'Pause Game');
+    pauseBtn.setAttribute('aria-pressed', paused.toString());
+  }
+}
+
 function toggleMute() {
   muted = !muted;
-  const muteBtn = document.getElementById('muteBtn');
-  if (muteBtn) {
-    muteBtn.textContent = muted ? '🔇' : '🔊';
-    muteBtn.setAttribute('aria-pressed', muted.toString());
-  }
-  
+  updateMuteBtnIcon();
   // Mute/unmute all sounds
   if (typeof sounds === 'object') {
     Object.values(sounds).forEach(snd => {
@@ -456,13 +456,19 @@ function toggleMute() {
       }
     });
   }
-  
-  // Save mute preference to localStorage
   localStorage.setItem('flappyMuted', muted);
 }
 
-// Add event listener for mute button
-document.getElementById('muteBtn')?.addEventListener('click', toggleMute);
+function updateMuteBtnIcon() {
+  const muteBtn = document.getElementById('muteBtn');
+  if (muteBtn) {
+    muteBtn.innerHTML = muted
+      ? '<i class="fas fa-volume-mute"></i>'
+      : '<i class="fas fa-volume-up"></i>';
+    muteBtn.setAttribute('aria-pressed', muted.toString());
+    muteBtn.setAttribute('aria-label', muted ? 'Unmute Sound' : 'Mute Sound');
+  }
+}
 
 // Fixed timestep game loop
 let lastFrameTime = 0;
@@ -486,10 +492,7 @@ function loop(now) {
     showGameOver();
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem('flappyBestScore', bestScore);
     }
-    hideHearts();
-    hidePauseBtn();
   }
 }
 
@@ -577,27 +580,26 @@ window.addEventListener('DOMContentLoaded', () => {
   // Add direct event listeners to pause and mute buttons to ensure they work
   const pauseBtn = document.getElementById('pauseBtn');
   const muteBtn = document.getElementById('muteBtn');
-  
+
   if (pauseBtn) {
-    // Remove any existing listeners first to avoid duplicates
-    const newPauseBtn = pauseBtn.cloneNode(true);
-    pauseBtn.parentNode.replaceChild(newPauseBtn, pauseBtn);
+    const newPauseBtn = pauseBtn.cloneNode(false); // clone without children
+    newPauseBtn.innerHTML = paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
     newPauseBtn.addEventListener('click', togglePause);
-    newPauseBtn.textContent = '⏸️';
     newPauseBtn.setAttribute('tabindex', '0');
-    newPauseBtn.setAttribute('aria-pressed', 'false');
+    newPauseBtn.setAttribute('aria-pressed', paused.toString());
+    newPauseBtn.setAttribute('aria-label', paused ? 'Resume Game' : 'Pause Game');
+    pauseBtn.parentNode.replaceChild(newPauseBtn, pauseBtn);
   }
-  
+
   if (muteBtn) {
-    // Remove any existing listeners first to avoid duplicates
-    const newMuteBtn = muteBtn.cloneNode(true);
-    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+    const newMuteBtn = muteBtn.cloneNode(false); // clone without children
+    newMuteBtn.innerHTML = muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
     newMuteBtn.addEventListener('click', toggleMute);
-    newMuteBtn.textContent = muted ? '�' : '�🔊';
-    newMuteBtn.style.display = 'none';
     newMuteBtn.setAttribute('tabindex', '0');
     newMuteBtn.setAttribute('aria-pressed', muted.toString());
-    newMuteBtn.setAttribute('aria-label', 'Mute/Unmute Sound');
+    newMuteBtn.setAttribute('aria-label', muted ? 'Unmute Sound' : 'Mute Sound');
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+    newMuteBtn.style.display = 'none'; // keep as before
   }
   
   // Keyboard controls - completely separate from button controls
@@ -625,5 +627,3 @@ window.addEventListener('DOMContentLoaded', () => {
   // Draw initial frame
   draw();
 });
-
-// Keyboard controls are now handled by the event listener in the DOMContentLoaded event

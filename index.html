@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
   <div id="gameContainer">
@@ -24,8 +25,12 @@
         <button id="restartBtn" aria-label="Restart Game">Restart</button>
       </div>
       <div id="hearts"></div>
-      <button id="pauseBtn" aria-label="Pause Game" style="display:none;">⏸️</button>
-      <button id="muteBtn" aria-label="Mute/Unmute Sound" style="display:none;">🔊</button>
+      <button id="pauseBtn" aria-label="Pause Game" style="display:none;">
+        <i class="fas fa-pause"></i>
+      </button>
+      <button id="muteBtn" aria-label="Mute/Unmute Sound" style="display:none;">
+        <i class="fas fa-volume-up"></i>
+      </button>
     </div>
   </div>
   <script type="module" src="game.js"></script>

@@ -155,44 +155,57 @@ body {
   position: absolute;
   top: 20px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.3);
-  color: #fff;
-  border: 2px solid #fff;
-  border-radius: 8px;
-  padding: 5px 10px;
+  font-size: 18px;
+  background: rgba(40, 40, 40, 0.45); /* fallback, will be overridden below */
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   pointer-events: auto;
   transition: all 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.10);
   margin-right: 0;
+  opacity: 0.92;
 }
 
 #pauseBtn {
   right: 80px;
+  background: rgba(255, 205, 0, 0.45); /* Pause: yellowish */
+  color: #222;
+}
+
+#pauseBtn i {
+  color: #222;
 }
 
 #muteBtn {
   right: 20px;
-  margin-left: 0;
+  background: rgba(60, 120, 255, 0.45); /* Mute: blue */
+  color: #fff;
 }
 
-#pauseBtn:hover, #muteBtn:hover {
-  background: #fff200;
-  color: #222;
-  border-color: #fff200;
-  transform: scale(1.08);
-  box-shadow: 0 4px 18px 0 rgba(0,0,0,0.18), 0 2px 8px 0 rgba(0,0,0,0.12);
-}
-
-#pauseBtn:active, #muteBtn:active {
-  background: #ffe066;
-  color: #222;
+#muteBtn i {
+  color: #fff;
 }
 
 #pauseBtn:focus, #muteBtn:focus {
   outline: 2px solid #fff200;
   outline-offset: 2px;
+}
+
+#pauseBtn:hover, #muteBtn:hover {
+  opacity: 1;
+  box-shadow: 0 4px 18px 0 rgba(0,0,0,0.18), 0 2px 8px 0 rgba(0,0,0,0.12);
+  transform: scale(1.08);
+}
+
+#pauseBtn:active, #muteBtn:active {
+  background: #ffe066;
+  color: #222;
 }
 
 #hearts {
