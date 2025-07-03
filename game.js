@@ -427,7 +427,11 @@ function loseLife() {
 function togglePause() {
   paused = !paused;
   const pauseBtn = document.getElementById('pauseBtn');
-  if (pauseBtn) pauseBtn.textContent = paused ? '▶️' : '⏸️';
+  if (pauseBtn) {
+    pauseBtn.textContent = paused ? '▶️' : '⏸️';
+    pauseBtn.setAttribute('aria-pressed', paused.toString());
+    pauseBtn.setAttribute('aria-label', paused ? 'Resume Game' : 'Pause Game');
+  }
   if (!paused && !gameOver) {
     lastFrameTime = performance.now();
     accumulator = 0;
@@ -435,23 +439,30 @@ function togglePause() {
   }
 }
 
-function setMute(state) {
-  muted = state;
+// Mute toggle function
+function toggleMute() {
+  muted = !muted;
   const muteBtn = document.getElementById('muteBtn');
-  if (muteBtn) muteBtn.textContent = muted ? '🔇' : '🔊';
+  if (muteBtn) {
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+    muteBtn.setAttribute('aria-pressed', muted.toString());
+  }
+  
   // Mute/unmute all sounds
-  if (window.sounds) {
+  if (typeof sounds === 'object') {
     Object.values(sounds).forEach(snd => {
       if (snd && typeof snd.muted !== 'undefined') {
         snd.muted = muted;
       }
     });
   }
+  
+  // Save mute preference to localStorage
+  localStorage.setItem('flappyMuted', muted);
 }
 
-function toggleMute() {
-  setMute(!muted);
-}
+// Add event listener for mute button
+document.getElementById('muteBtn')?.addEventListener('click', toggleMute);
 
 // Fixed timestep game loop
 let lastFrameTime = 0;
@@ -516,6 +527,19 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedScore = localStorage.getItem('flappyBestScore');
   bestScore = savedScore ? parseInt(savedScore) : 0;
   updateBestScore(bestScore);
+  
+  // Load mute preference
+  const savedMute = localStorage.getItem('flappyMuted');
+  muted = savedMute === 'true';
+  
+  // Apply mute settings to sound objects
+  if (muted && typeof sounds === 'object') {
+    Object.values(sounds).forEach(snd => {
+      if (snd && typeof snd.muted !== 'undefined') {
+        snd.muted = muted;
+      }
+    });
+  }
 
   // Setup controls (only once)
   console.log('Calling setupControls', { startGame, jump, togglePause, canvas });
@@ -550,16 +574,50 @@ window.addEventListener('DOMContentLoaded', () => {
     startBtn.onclick = startGame;
   }
 
-  // Attach mute button event
+  // Add direct event listeners to pause and mute buttons to ensure they work
+  const pauseBtn = document.getElementById('pauseBtn');
   const muteBtn = document.getElementById('muteBtn');
-  if (muteBtn) {
-    muteBtn.onclick = toggleMute;
-    muteBtn.textContent = '🔊';
-    muteBtn.style.display = 'none';
-    muteBtn.setAttribute('tabindex', '0');
-    muteBtn.setAttribute('aria-pressed', 'false');
-    muteBtn.setAttribute('aria-label', 'Mute/Unmute Sound');
+  
+  if (pauseBtn) {
+    // Remove any existing listeners first to avoid duplicates
+    const newPauseBtn = pauseBtn.cloneNode(true);
+    pauseBtn.parentNode.replaceChild(newPauseBtn, pauseBtn);
+    newPauseBtn.addEventListener('click', togglePause);
+    newPauseBtn.textContent = '⏸️';
+    newPauseBtn.setAttribute('tabindex', '0');
+    newPauseBtn.setAttribute('aria-pressed', 'false');
   }
+  
+  if (muteBtn) {
+    // Remove any existing listeners first to avoid duplicates
+    const newMuteBtn = muteBtn.cloneNode(true);
+    muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
+    newMuteBtn.addEventListener('click', toggleMute);
+    newMuteBtn.textContent = muted ? '�' : '�🔊';
+    newMuteBtn.style.display = 'none';
+    newMuteBtn.setAttribute('tabindex', '0');
+    newMuteBtn.setAttribute('aria-pressed', muted.toString());
+    newMuteBtn.setAttribute('aria-label', 'Mute/Unmute Sound');
+  }
+  
+  // Keyboard controls - completely separate from button controls
+  document.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
+    if (e.code === 'Space' || e.key === ' ') {
+      if (!started) startGame();
+      if (!paused && !gameOver) jump();
+    }
+    // Use e.code for reliability, but also check for active form elements
+    const tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (e.code === 'KeyP' && !['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) {
+      e.preventDefault();
+      togglePause();
+    }
+    if (e.code === 'KeyM' && !['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) {
+      e.preventDefault();
+      toggleMute();
+    }
+  });
 
   // Show start screen
   showStartScreen();
@@ -567,3 +625,5 @@ window.addEventListener('DOMContentLoaded', () => {
   // Draw initial frame
   draw();
 });
+
+// Keyboard controls are now handled by the event listener in the DOMContentLoaded event

@@ -18,23 +18,23 @@ export function setupControls(startGame, jump, togglePause, canvas) {
     
     const startBtn = document.getElementById('startBtn');
     const restartBtn = document.getElementById('restartBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
     
     console.log("startBtn found:", !!startBtn);
     console.log("restartBtn found:", !!restartBtn);
     
+    // Only attach to start and restart buttons here
+    // Pause and mute buttons are handled in game.js
     if (startBtn) startBtn.addEventListener('click', function() {
       console.log("StartBtn click event fired");
       startGame();
     });
     if (restartBtn) restartBtn.addEventListener('click', startGame);
-    if (pauseBtn) pauseBtn.addEventListener('click', togglePause);
     
+    // Only listen for Space key here
+    // P and M keys are handled in game.js
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space') {
         jump();
-      } else if (e.code === 'KeyP') {
-        togglePause();
       }
     });
   }
