@@ -132,23 +132,50 @@ body {
 }
 
 #restartBtn, #startBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Press Start 2P', monospace;
-  font-size: 14px;
-  background: #ff0;
-  color: #222;
+  font-size: 18px;
   border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
   cursor: pointer;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.18), 0 2px 8px 0 rgba(0,0,0,0.12);
+  transition: all 0.2s, box-shadow 0.2s;
   margin-top: 8px;
-  pointer-events: auto;
-  transition: all 0.2s;
+  margin-bottom: 8px;
+  opacity: 0.95;
+  background: linear-gradient(145deg, rgba(60,255,120,0.45) 0%, rgba(40,180,80,0.45) 100%); /* Start: green gradient */
+  color: #fff;
   z-index: 10000 !important;
 }
 
-#restartBtn:hover, #startBtn:hover {
-  background: #fff200;
-  transform: scale(1.05);
+#restartBtn {
+  background: linear-gradient(145deg, rgba(255,120,60,0.45) 0%, rgba(180,40,40,0.45) 100%); /* Restart: orange/red gradient */
+}
+
+#startBtn i, #restartBtn i {
+  font-size: 24px;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+
+#startBtn:focus, #restartBtn:focus {
+  outline: 2px solid #fff200;
+  outline-offset: 2px;
+}
+
+#startBtn:hover, #restartBtn:hover {
+  opacity: 1;
+  box-shadow: 0 6px 24px 0 rgba(0,0,0,0.22), 0 3px 12px 0 rgba(0,0,0,0.16);
+  transform: scale(1.08);
+}
+
+#startBtn:active, #restartBtn:active {
+  background: #ffe066;
+  color: #222;
 }
 
 #pauseBtn, #muteBtn {
