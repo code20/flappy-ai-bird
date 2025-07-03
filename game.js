@@ -40,6 +40,7 @@ let paused = false;
 let currentPipeGap = BASE_PIPE_GAP;
 let currentPipeSpeed = BASE_PIPE_SPEED;
 let lastJumpTime = 0;
+let muted = false;
 
 // UI Functions Implementation
 function showStartScreen() {
@@ -71,12 +72,16 @@ function hideGameOver() {
 
 function showPauseBtn() {
   const pauseBtn = document.getElementById('pauseBtn');
+  const muteBtn = document.getElementById('muteBtn');
   if (pauseBtn) pauseBtn.style.display = 'block';
+  if (muteBtn) muteBtn.style.display = 'block';
 }
 
 function hidePauseBtn() {
   const pauseBtn = document.getElementById('pauseBtn');
+  const muteBtn = document.getElementById('muteBtn');
   if (pauseBtn) pauseBtn.style.display = 'none';
+  if (muteBtn) muteBtn.style.display = 'none';
 }
 
 function showHearts() {
@@ -349,9 +354,8 @@ function update() {
     if (!pipe.passed && pipeRight < bird.x) {
       score++;
       pipe.passed = true;
-      
       try {
-        if (sounds.score) {
+        if (sounds.score && !muted) {
           sounds.score.currentTime = 0;
           sounds.score.play();
         }
@@ -371,7 +375,7 @@ function jump() {
   lastJumpTime = now;
   bird.vy = JUMP;
   try {
-    if (sounds.jump) {
+    if (sounds.jump && !muted) {
       sounds.jump.currentTime = 0;
       sounds.jump.play();
     }
@@ -392,7 +396,7 @@ function loseLife() {
   lives--;
   
   try {
-    if (sounds.hit) {
+    if (sounds.hit && !muted) {
       sounds.hit.currentTime = 0;
       sounds.hit.play();
     }
@@ -424,10 +428,29 @@ function togglePause() {
   paused = !paused;
   const pauseBtn = document.getElementById('pauseBtn');
   if (pauseBtn) pauseBtn.textContent = paused ? '▶️' : '⏸️';
-  
   if (!paused && !gameOver) {
-    loop();
+    lastFrameTime = performance.now();
+    accumulator = 0;
+    requestAnimationFrame(loop);
   }
+}
+
+function setMute(state) {
+  muted = state;
+  const muteBtn = document.getElementById('muteBtn');
+  if (muteBtn) muteBtn.textContent = muted ? '🔇' : '🔊';
+  // Mute/unmute all sounds
+  if (window.sounds) {
+    Object.values(sounds).forEach(snd => {
+      if (snd && typeof snd.muted !== 'undefined') {
+        snd.muted = muted;
+      }
+    });
+  }
+}
+
+function toggleMute() {
+  setMute(!muted);
 }
 
 // Fixed timestep game loop
@@ -525,6 +548,17 @@ window.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('startBtn');
   if (startBtn) {
     startBtn.onclick = startGame;
+  }
+
+  // Attach mute button event
+  const muteBtn = document.getElementById('muteBtn');
+  if (muteBtn) {
+    muteBtn.onclick = toggleMute;
+    muteBtn.textContent = '🔊';
+    muteBtn.style.display = 'none';
+    muteBtn.setAttribute('tabindex', '0');
+    muteBtn.setAttribute('aria-pressed', 'false');
+    muteBtn.setAttribute('aria-label', 'Mute/Unmute Sound');
   }
 
   // Show start screen
