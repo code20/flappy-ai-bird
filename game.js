@@ -4,7 +4,7 @@ import { drawBird } from './gameFunctions/bird.js';
 import { drawPipes } from './gameFunctions/pipes.js';
 import { drawParallax, updateParallax, drawCloud, updateClouds } from './gameFunctions/parallax.js';
 import { sounds, unlockAudio } from './gameFunctions/sound.js';
-import { updateHearts, updateBestScore, updateDifficulty } from './gameFunctions/state.js';
+import { updateBestScore, updateDifficulty } from './gameFunctions/state.js';
 import { createParticle, updateParticles, drawParticles } from './gameFunctions/particles.js';
 
 let canvas, ctx;
@@ -86,12 +86,27 @@ function hidePauseBtn() {
 
 function showHearts() {
   const hearts = document.getElementById('hearts');
-  if (hearts) hearts.style.display = 'block';
+  if (hearts) hearts.style.display = 'flex';
 }
 
 function hideHearts() {
   const hearts = document.getElementById('hearts');
   if (hearts) hearts.style.display = 'none';
+}
+
+// Update the hearts display to use Font Awesome icons
+export function updateHearts(lives) {
+  const hearts = document.getElementById('hearts');
+  if (hearts) {
+    hearts.innerHTML = '';
+    for (let i = 0; i < lives; i++) {
+      const heart = document.createElement('span');
+      heart.className = 'heart';
+      heart.innerHTML = '<i class="fas fa-heart" aria-label="Life"></i>';
+      hearts.appendChild(heart);
+    }
+    hearts.setAttribute('aria-label', `${lives} lives left`);
+  }
 }
 
 // Responsive canvas setup
