@@ -1,4 +1,3 @@
-// Pipes module for Flappy Retro
 // Handles drawing of pipes
 
 // Pipe color palettes for 3D effect
@@ -29,7 +28,7 @@ export function drawPipes(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas, groundY
 
   const pipeTopHeight = pipe.top;
   const pipeBottomY = pipe.top + currentPipeGap;
-  const pipeEndMargin = 8; // Margin for pipe ends
+  const pipeEndMargin = -8; // Margin for pipe ends
 
   // --- Top Pipe ---
   ctx.save();

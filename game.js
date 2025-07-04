@@ -345,30 +345,52 @@ function update() {
 
   // Collision detection
   for (let pipe of pipes) {
-    const pipeRight = pipe.x + PIPE_WIDTH;
-    const birdRight = bird.x + bird.w;
-    const birdBottom = bird.y + bird.h;
-    
-    // Collision with statue
-    if (pipe.isStatue) {
-      if (birdRight - 10 > pipe.x && 
-          bird.x + 10 < pipeRight &&
-          birdBottom - 5 > pipe.top + currentPipeGap) {
-        loseLife();
-        return;
-      }
-    } 
-    // Collision with normal pipe
-    else {
-      if (birdRight - 10 > pipe.x && 
-          bird.x + 10 < pipeRight &&
-          (bird.y + 5 < pipe.top || birdBottom - 5 > pipe.top + currentPipeGap)) {
-        loseLife();
-        return;
-      }
+    if (pipe.isStatue) continue;
+    const pipeEndMargin = -8; // Match the drawing code
+
+    // Top pipe rectangle (matches drawing)
+    const topPipeRect = {
+      x: pipe.x,
+      y: 0,
+      w: PIPE_WIDTH,
+      h: pipe.top - 18 - pipeEndMargin
+    };
+
+    // Bottom pipe rectangle (matches drawing)
+    const bottomPipeRect = {
+      x: pipe.x,
+      y: pipe.top + currentPipeGap + 18 + pipeEndMargin,
+      w: PIPE_WIDTH,
+      h: groundY - (pipe.top + currentPipeGap + 18 + pipeEndMargin)
+    };
+
+    // Bird rectangle (shrink by 4px on all sides for a more forgiving collision)
+    const birdRect = {
+      x: bird.x + 2,
+      y: bird.y + 2,
+      w: bird.w - 4,
+      h: bird.h - 4
+    };
+
+    function rectsOverlap(a, b) {
+      return (
+        a.x < b.x + b.w &&
+        a.x + a.w > b.x &&
+        a.y < b.y + b.h &&
+        a.y + a.h > b.y
+      );
     }
-    
+
+    if (
+      rectsOverlap(birdRect, topPipeRect) ||
+      rectsOverlap(birdRect, bottomPipeRect)
+    ) {
+      loseLife();
+      return;
+    }
+
     // Scoring
+    const pipeRight = pipe.x + PIPE_WIDTH;
     if (!pipe.passed && pipeRight < bird.x) {
       score++;
       pipe.passed = true;
