@@ -2,7 +2,7 @@
 import { setupControls } from './gameFunctions/controls.js';
 import { drawBird } from './gameFunctions/bird.js';
 import { drawPipes } from './gameFunctions/pipes.js';
-import { drawParallax, updateParallax, drawCloud, updateClouds } from './gameFunctions/parallax.js';
+import { drawDarkParallax, drawLightParallax, updateParallax, drawCloud, updateClouds } from './gameFunctions/parallax.js';
 import { sounds, unlockAudio } from './gameFunctions/sound.js';
 import { updateBestScore } from './gameFunctions/state.js';
 import { createParticle, updateParticles, drawParticles } from './gameFunctions/particles.js';
@@ -15,6 +15,9 @@ const BIRD_COLORS = ['#FF8C00', '#FFD700', '#FF6347', '#00BFFF'];
 const DIFFICULTY_SCORE_INTERVAL = 5;
 const STATUE_CHANCE = 0.2;
 const JUMP_COOLDOWN = 100;
+const NightViewScore = 20;
+const BuildingSizeIncreaseScore = 10;
+
 
 // Cloud settings
 const CLOUDS = [
@@ -28,12 +31,22 @@ const CLOUDS = [
 // Game state
 let bird, pipes, score, gameOver, frame, started, birdFrame, bestScore = 0;
 let particles = [];
+
 let parallaxLayers = [
   { speed: 0.2, offset: 0, height: 100, color: '#27ae60' },
   { speed: 0.4, offset: 0, height: 80, color: '#2ecc71' },
   { speed: 0.6, offset: 0, height: 60, color: '#1abc9c' },
   { speed: 0.1, offset: 0, height: 40, color: '#34495e' } 
 ];
+
+let parallaxLayers1 = [
+  { speed: 0.2, offset: 0, height: 100, color: '#2c3e50' },
+  { speed: 0.4, offset: 0, height: 80, color: '#34495e' },
+  { speed: 0.6, offset: 0, height: 60, color: '#2c3e50' },
+  { speed: 0.1, offset: 0, height: 150, color: '#34495e' }
+];
+
+
 let groundY = 500;
 let lives = 3;
 let paused = false;
@@ -77,21 +90,9 @@ function showPauseBtn() {
   if (muteBtn) muteBtn.style.display = 'block';
 }
 
-function hidePauseBtn() {
-  const pauseBtn = document.getElementById('pauseBtn');
-  const muteBtn = document.getElementById('muteBtn');
-  if (pauseBtn) pauseBtn.style.display = 'none';
-  if (muteBtn) muteBtn.style.display = 'none';
-}
-
 function showHearts() {
   const hearts = document.getElementById('hearts');
   if (hearts) hearts.style.display = 'flex';
-}
-
-function hideHearts() {
-  const hearts = document.getElementById('hearts');
-  if (hearts) hearts.style.display = 'none';
 }
 
 // Update the hearts display to use Font Awesome icons
@@ -220,12 +221,17 @@ function resetGameStateVars() {
 
 function draw() {
   if (!ctx || !canvas) return;
-  
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawParallax(ctx, canvas, parallaxLayers, groundY);
-  
+
+  // Use parallaxLayers or parallaxLayers1 based on score
+  const layers = (score >= BuildingSizeIncreaseScore) ? parallaxLayers1 : parallaxLayers;
+  const drawParallax = score >= NightViewScore ? drawDarkParallax : drawLightParallax;
+
+  drawParallax(ctx, canvas, layers, groundY);
+
   for (let cloud of CLOUDS) drawCloud(ctx, cloud);
-  
+
   if (bird) {
     for (let pipe of pipes) drawPipes(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas, groundY);
     drawBird(ctx, bird, frame || 0, BIRD_SIZE);
@@ -279,12 +285,6 @@ function update() {
     BASE_PIPE_GAP - Math.floor(score / DIFFICULTY_SCORE_INTERVAL) * 10
   );
 
-  // Optionally, you can also increase pipe speed here for more challenge:
-  // currentPipeSpeed = Math.min(
-  //   MAX_PIPE_SPEED,
-  //   BASE_PIPE_SPEED + Math.floor(score / DIFFICULTY_SCORE_INTERVAL) * 0.2
-  // );
-
   // Apply physics
   bird.vy += GRAVITY;
   bird.y += bird.vy;
@@ -292,7 +292,10 @@ function update() {
   
   // Update environment
   updateClouds(CLOUDS, canvas);
-  updateParallax(parallaxLayers, canvas);
+
+  // Use parallaxLayers or parallaxLayers1 based on score
+  const layers = (score >= BuildingSizeIncreaseScore) ? parallaxLayers1 : parallaxLayers;
+  updateParallax(layers, canvas);
   updateParticles(particles);
 
   // Ground collision
