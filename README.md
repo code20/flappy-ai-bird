@@ -38,7 +38,6 @@ The result: a polished take on Flappy Bird with animations, custom mechanics, an
 - 🔁 Entirely prompt-generated: code, logic, and visuals
 - 🖼️ Responsive canvas with fluid UI
 - ⛅ Animated parallax clouds and layered background
-- 🤖 “Statue” obstacles with unique mechanics
 - 🔊 Sound effects for jump, hit, and score events
 - 💾 LocalStorage-based best score tracking
 - ✨ Particle effects and visual polish
