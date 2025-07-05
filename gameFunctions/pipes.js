@@ -16,11 +16,7 @@ const PIPE_COLORS = {
   }
 };
 
-export function drawPipes(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas, groundY) {
-  // Only draw pipes, ignore statues
-  if (pipe.isStatue) {
-    return;
-  }
+export function drawPipes(ctx, pipe, currentPipeGap, PIPE_WIDTH, canvas) {
 
   // Pick color set (default to green if not set)
   const colorKey = pipe.color || 'green';

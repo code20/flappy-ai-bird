@@ -129,9 +129,6 @@ export function drawModernCity(ctx, x, y, height) {
   ctx.restore();
 }
 
-
-//////////////////////////////////////////////////
-
 export function drawLightParallax(ctx, canvas, parallaxLayers, groundY) {
   // Draw sky gradient
   const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
