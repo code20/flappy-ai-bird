@@ -42,6 +42,7 @@ The result: a polished take on Flappy Bird with animations, custom mechanics, an
 - 💾 LocalStorage-based best score tracking
 - ✨ Particle effects and visual polish
 - ⏸️ Pause/resume, lives, and game state handling
+- 🎯 Three difficulty levels: Easy, Medium, and Hard
 
 ---
 
@@ -50,6 +51,7 @@ The result: a polished take on Flappy Bird with animations, custom mechanics, an
 - Press **[Space]** or **Click/Tap** to flap
 - Avoid pipes and statues
 - Earn points by staying alive
+- Choose your difficulty level: **Easy**, **Medium**, or **Hard**
 - Press **[P]** or the pause icon to pause/resume
 - Press **[M]** or the sound icon to mute/unmute sounds
 - Your best score will be remembered!
@@ -72,24 +74,28 @@ You can view all instructions and prompts used in [`PROMPTS.md`](docs/PROMPTS.md
 Here are just a few of the natural language prompts that shaped the game:
 
 ### 🏗️ Game Structure & Logic
+
 - "Create a Flappy Bird clone using HTML5 Canvas and JavaScript."
 - "Make pipes appear at random heights and move from right to left."
 - "Add a new obstacle type called 'statue' that behaves differently from pipes."
 - "Track and display the best score using localStorage."
 
 ### 🎮 Controls & Feedback
+
 - "Make the bird flap when the spacebar is pressed or the canvas is clicked."
 - "Implement a pause/resume feature with a button and keyboard shortcut."
 - "Add a mute/unmute feature with a button and keyboard shortcut."
 - "Add a start screen and a game over screen with restart button."
 
 ### 🎨 Design & Effects
+
 - "Add a parallax background with animated clouds."
 - "Show hearts for lives remaining in the top-left corner."
 - "Show a particle effect when the bird jumps or hits something."
 - "Style the pause and mute buttons to look modern and consistent."
 
 ### 🐞 Fixes & Iteration
+
 - "Fix the bug where the game over screen doesn't show after losing all lives."
 - "Adjust the collision detection so the bird can't clip through pipes."
 - "Fix conflicts between keyboard shortcuts for pause and mute features."
@@ -98,5 +104,5 @@ Here are just a few of the natural language prompts that shaped the game:
 
 ## ✍️ Credits
 
-- **Concept, design, and prompt authoring**: [code20](https://github.com/code20)  
+- **Concept, design, and prompt authoring**: [code20](https://github.com/code20)
 - **Code generation**: GitHub Copilot in VS Code
