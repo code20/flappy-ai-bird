@@ -72,6 +72,7 @@ let currentPipeGap = BASE_PIPE_GAP;
 let currentPipeSpeed = BASE_PIPE_SPEED;
 let lastJumpTime = 0;
 let muted = false;
+let invincibilityFrames = 0; 
 
 // Responsive canvas setup
 function resizeCanvas() {
@@ -262,41 +263,45 @@ function update() {
   pipes = pipes.filter((pipe) => pipe.x + PIPE_WIDTH > 0);
 
   // Collision detection
-  for (let pipe of pipes) {
-    const pipeEndMargin = -8; // Match the drawing code
+  if (invincibilityFrames > 0) {
+  invincibilityFrames--;
+}
 
-    // Top pipe rectangle (matches drawing)
-    const topPipeRect = {
-      x: pipe.x,
-      y: 0,
-      w: PIPE_WIDTH,
-      h: pipe.top - 18 - pipeEndMargin,
-    };
+for (let pipe of pipes) {
+  const pipeEndMargin = -8; // Match the drawing code
 
-    // Bottom pipe rectangle (matches drawing)
-    const bottomPipeRect = {
-      x: pipe.x,
-      y: pipe.top + currentPipeGap + 18 + pipeEndMargin,
-      w: PIPE_WIDTH,
-      h: groundY - (pipe.top + currentPipeGap + 18 + pipeEndMargin),
-    };
+  // Top pipe rectangle (matches drawing)
+  const topPipeRect = {
+    x: pipe.x,
+    y: 0,
+    w: PIPE_WIDTH,
+    h: pipe.top - 18 - pipeEndMargin,
+  };
 
-    // Bird rectangle (shrink by 4px on all sides for a more forgiving collision)
-    const birdRect = {
-      x: bird.x + 2,
-      y: bird.y + 2,
-      w: bird.w - 4,
-      h: bird.h - 4,
-    };
+  // Bottom pipe rectangle (matches drawing)
+  const bottomPipeRect = {
+    x: pipe.x,
+    y: pipe.top + currentPipeGap + 18 + pipeEndMargin,
+    w: PIPE_WIDTH,
+    h: groundY - (pipe.top + currentPipeGap + 18 + pipeEndMargin),
+  };
 
-    function rectsOverlap(a, b) {
-      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-    }
+  // Bird rectangle (shrink by 4px on all sides for a more forgiving collision)
+  const birdRect = {
+    x: bird.x + 2,
+    y: bird.y + 2,
+    w: bird.w - 4,
+    h: bird.h - 4,
+  };
 
-    if (rectsOverlap(birdRect, topPipeRect) || rectsOverlap(birdRect, bottomPipeRect)) {
-      loseLife();
-      return;
-    }
+  function rectsOverlap(a, b) {
+    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  }
+
+  if (invincibilityFrames === 0 && (rectsOverlap(birdRect, topPipeRect) || rectsOverlap(birdRect, bottomPipeRect))) {
+    loseLife();
+    return;
+  }
 
     // Scoring
     const pipeRight = pipe.x + PIPE_WIDTH;
@@ -339,6 +344,7 @@ function jump() {
 
 function loseLife() {
   lives--;
+  invincibilityFrames = 60; // 1 second of invincibility
 
   try {
     if (sounds.hit && !muted) {
@@ -358,11 +364,18 @@ function loseLife() {
     bird.y = canvas.height / 2;
     bird.vy = 0;
 
-    // Remove overlapping pipes
-    pipes = pipes.filter((pipe) => {
-      const pipeRight = pipe.x + PIPE_WIDTH;
-      return !(bird.x + bird.w - 10 > pipe.x && bird.x + 10 < pipeRight);
+    // --- Reset pipes like at game start ---
+    pipes = [];
+    const top =
+      Math.floor(Math.random() * (groundY - currentPipeGap - PIPE_TOP_BUFFER)) + PIPE_TOP_MIN;
+    pipes.push({
+      x: canvas.width,
+      top,
+      passed: false,
+      color: PIPE_COLORS[Math.floor(Math.random() * PIPE_COLORS.length)],
     });
+
+    frame = 1;
 
     showHearts();
     updateHearts(lives);
