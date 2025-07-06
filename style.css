@@ -3,7 +3,7 @@ body {
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
   color: #fff;
-  font-family: 'Press Start 2P', monospace;
+  font-family: "Press Start 2P", monospace;
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -15,9 +15,15 @@ body {
 }
 
 @keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 #gameContainer {
@@ -63,13 +69,14 @@ body {
   padding: 8px 24px;
   font-weight: bold;
   text-align: center;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 1px 0 #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 1px 0 #fff;
   box-shadow: none;
   background: none;
   z-index: 20;
 }
 
-#startScreen, #gameOver {
+#startScreen,
+#gameOver {
   position: absolute;
   top: 0;
   left: 0;
@@ -79,7 +86,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   pointer-events: auto;
   z-index: 2;
 }
@@ -87,6 +94,16 @@ body {
 #startScreen {
   z-index: 3;
   pointer-events: auto !important;
+}
+
+#startScreen * {
+  pointer-events: auto;
+}
+
+#startScreen #difficultySelect,
+#startScreen #difficulty {
+  pointer-events: auto !important;
+  z-index: 99999 !important;
 }
 
 #startScreen .title {
@@ -97,7 +114,7 @@ body {
   padding: 18px 36px 14px 36px;
   margin-bottom: 16px;
   text-align: center;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 1px 0 #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 1px 0 #fff;
   letter-spacing: 2px;
   box-shadow: none;
   background: none;
@@ -110,7 +127,7 @@ body {
   padding: 10px 22px;
   margin-bottom: 12px;
   text-align: center;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
   font-weight: 500;
   background: none;
 }
@@ -124,7 +141,7 @@ body {
   margin-bottom: 8px;
   text-align: center;
   font-weight: 600;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
   background: none;
 }
 
@@ -154,7 +171,7 @@ body {
   padding: 16px 36px 12px 36px;
   margin-bottom: 12px;
   text-align: center;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 1px 0 #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 1px 0 #fff;
   letter-spacing: 2px;
   box-shadow: none;
   background: none;
@@ -168,63 +185,84 @@ body {
   margin-bottom: 10px;
   text-align: center;
   font-weight: 700;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
   background: none;
 }
 
-#restartBtn, #startBtn {
+#restartBtn,
+#startBtn {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Press Start 2P', monospace;
+  font-family: "Press Start 2P", monospace;
   font-size: 18px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.18), 0 2px 8px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.18),
+    0 2px 8px 0 rgba(0, 0, 0, 0.12);
   transition: all 0.2s, box-shadow 0.2s;
   margin-top: 8px;
   margin-bottom: 8px;
   opacity: 0.95;
-  background: linear-gradient(145deg, rgba(60,255,120,0.45) 0%, rgba(40,180,80,0.45) 100%); /* Start: green gradient */
+  background: linear-gradient(
+    145deg,
+    rgba(60, 255, 120, 0.45) 0%,
+    rgba(40, 180, 80, 0.45) 100%
+  ); /* Start: green gradient */
   color: #fff;
   z-index: 10000 !important;
 }
 
 #restartBtn {
-  background: linear-gradient(145deg, rgba(255,120,60,0.45) 0%, rgba(180,40,40,0.45) 100%); /* Restart: orange/red gradient */
+  background: linear-gradient(
+    145deg,
+    rgba(255, 120, 60, 0.45) 0%,
+    rgba(180, 40, 40, 0.45) 100%
+  ); /* Restart: orange/red gradient */
 }
 
-#startBtn i, #restartBtn i {
+#startBtn i,
+#restartBtn i {
   font-size: 24px;
   color: #fff;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
 }
 
-#startBtn:focus, #restartBtn:focus {
+#startBtn:focus,
+#restartBtn:focus {
   outline: 2px solid #fff200;
   outline-offset: 2px;
 }
 
-#startBtn:hover, #restartBtn:hover {
+#startBtn:hover,
+#restartBtn:hover {
   opacity: 1;
-  box-shadow: 0 6px 24px 0 rgba(0,0,0,0.22), 0 3px 12px 0 rgba(0,0,0,0.16);
+  box-shadow: 0 6px 24px 0 rgba(0, 0, 0, 0.22),
+    0 3px 12px 0 rgba(0, 0, 0, 0.16);
   transform: scale(1.08);
 }
 
-#startBtn:active, #restartBtn:active {
+#startBtn:active,
+#restartBtn:active {
   background: #ffe066;
   color: #222;
 }
 
-#pauseBtn, #muteBtn {
+#pauseBtn,
+#muteBtn {
   position: absolute;
   top: 20px;
-  font-family: 'Press Start 2P', monospace;
+  font-family: "Press Start 2P", monospace;
   font-size: 18px;
-  background: rgba(40, 40, 40, 0.45); /* fallback, will be overridden below */
+  background: rgba(
+    40,
+    40,
+    40,
+    0.45
+  ); /* fallback, will be overridden below */
   border: none;
   border-radius: 50%;
   width: 48px;
@@ -235,7 +273,8 @@ body {
   cursor: pointer;
   pointer-events: auto;
   transition: all 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.10);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1),
+    0 1.5px 4px 0 rgba(0, 0, 0, 0.1);
   margin-right: 0;
   opacity: 0.92;
 }
@@ -260,18 +299,22 @@ body {
   color: #fff;
 }
 
-#pauseBtn:focus, #muteBtn:focus {
+#pauseBtn:focus,
+#muteBtn:focus {
   outline: 2px solid #fff200;
   outline-offset: 2px;
 }
 
-#pauseBtn:hover, #muteBtn:hover {
+#pauseBtn:hover,
+#muteBtn:hover {
   opacity: 1;
-  box-shadow: 0 4px 18px 0 rgba(0,0,0,0.18), 0 2px 8px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.18),
+    0 2px 8px 0 rgba(0, 0, 0, 0.12);
   transform: scale(1.08);
 }
 
-#pauseBtn:active, #muteBtn:active {
+#pauseBtn:active,
+#muteBtn:active {
   background: #ffe066;
   color: #222;
 }
@@ -296,7 +339,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.10);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1),
+    0 1.5px 4px 0 rgba(0, 0, 0, 0.1);
   transition: all 0.2s, box-shadow 0.2s;
   opacity: 0.92;
 }
@@ -304,14 +348,16 @@ body {
 .heart i {
   color: #fff;
   font-size: 22px;
-  text-shadow: 0 1px 4px rgba(255,0,0,0.18);
+  text-shadow: 0 1px 4px rgba(255, 0, 0, 0.18);
 }
 
-.heart:focus, .heart:hover {
+.heart:focus,
+.heart:hover {
   outline: 2px solid #ff3250;
   outline-offset: 2px;
   opacity: 1;
-  box-shadow: 0 4px 18px 0 rgba(255,50,80,0.18), 0 2px 8px 0 rgba(255,50,80,0.12);
+  box-shadow: 0 4px 18px 0 rgba(255, 50, 80, 0.18),
+    0 2px 8px 0 rgba(255, 50, 80, 0.12);
   transform: scale(1.08);
 }
 
@@ -321,31 +367,33 @@ body {
     width: 100vw;
     height: 70vh;
   }
-  
+
   #startScreen .title {
     font-size: 16px;
   }
-  
+
   #startScreen .instructions {
     font-size: 10px;
   }
-  
-  #restartBtn, #startBtn {
+
+  #restartBtn,
+  #startBtn {
     font-size: 12px;
     padding: 6px 12px;
   }
-  
-  #pauseBtn, #muteBtn {
+
+  #pauseBtn,
+  #muteBtn {
     top: 10px;
     font-size: 12px;
     padding: 4px 8px;
     border-radius: 6px;
   }
-  
+
   #pauseBtn {
     right: 50px;
   }
-  
+
   #muteBtn {
     right: 10px;
   }
@@ -355,4 +403,89 @@ body {
   #gameCanvas {
     height: 90vh;
   }
+}
+
+/* Style the difficulty dropdown to match the game's UI */
+#difficultySelect {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+  position: relative;
+}
+
+#difficultySelect label {
+  color: #fff200;
+  font-size: 1.1rem;
+  font-family: "Press Start 2P", monospace;
+  margin-right: 10px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+.custom-dropdown {
+  position: relative;
+  z-index: 99999 !important;
+}
+
+#difficulty {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  background: #2c3e50;
+  color: #fff;
+  margin-left: 8px;
+  margin-right: 8px;
+  cursor: pointer;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+  position: relative;
+  min-width: 120px;
+  user-select: none;
+}
+
+.dropdown-options {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #2c3e50;
+  border: 2px solid #fff;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  z-index: 99999 !important;
+}
+
+.dropdown-options.show {
+  display: block;
+}
+
+.dropdown-option {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  padding: 8px 12px;
+  color: #fff;
+  cursor: pointer;
+  pointer-events: auto !important;
+  border-bottom: 1px solid #34495e;
+}
+
+.dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.dropdown-option:hover {
+  background: #34495e;
+  color: #fff200;
+}
+
+#difficulty:focus,
+#difficulty:hover {
+  background: #34495e;
+  border-color: #fff200;
 }

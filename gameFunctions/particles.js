@@ -1,4 +1,3 @@
-
 export function createParticle(x, y, color) {
   return {
     x: x,
@@ -7,7 +6,7 @@ export function createParticle(x, y, color) {
     speedX: Math.random() * 4 - 2,
     speedY: Math.random() * 2 - 4,
     color: color,
-    life: 20
+    life: 20,
   };
 }
 

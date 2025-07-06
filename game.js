@@ -1,4 +1,7 @@
-import { setupControls } from "./gameFunctions/controls.js";
+import {
+  setupControls,
+  getDifficultySettings,
+} from "./gameFunctions/controls.js";
 import { drawBird } from "./gameFunctions/bird.js";
 import { drawPipes } from "./gameFunctions/pipes.js";
 import {
@@ -10,7 +13,11 @@ import {
 } from "./gameFunctions/parallax.js";
 import { sounds, unlockAudio } from "./gameFunctions/sound.js";
 import { updateBestScore } from "./gameFunctions/state.js";
-import { createParticle, updateParticles, drawParticles } from "./gameFunctions/particles.js";
+import {
+  createParticle,
+  updateParticles,
+  drawParticles,
+} from "./gameFunctions/particles.js";
 import {
   BIRD_COLORS,
   DIFFICULTY_SCORE_INTERVAL,
@@ -29,6 +36,7 @@ import {
   BIRD_START_X,
   PIPE_TOP_MIN,
   PIPE_TOP_BUFFER,
+  DESIRED_PIPE_PIXEL_GAP,
 } from "./consts.js";
 import {
   draw,
@@ -70,9 +78,10 @@ let lives = INITIAL_LIVES;
 let paused = false;
 let currentPipeGap = BASE_PIPE_GAP;
 let currentPipeSpeed = BASE_PIPE_SPEED;
+PIPE_INTERVAL = Math.round(DESIRED_PIPE_PIXEL_GAP / currentPipeSpeed);
 let lastJumpTime = 0;
 let muted = false;
-let invincibilityFrames = 0; 
+let invincibilityFrames = 0;
 
 // Responsive canvas setup
 function resizeCanvas() {
@@ -95,7 +104,7 @@ function resizeCanvas() {
   // Physics constants: keep original values
   GRAVITY = 0.4;
   JUMP = -7.5;
-  BASE_PIPE_SPEED = 3.5;
+  BASE_PIPE_SPEED = getDifficultySettings(); // Set based on selected difficulty
 
   if (bird) {
     bird.w = BIRD_SIZE;
@@ -138,14 +147,17 @@ function resetGame() {
     vy: 0,
     w: BIRD_SIZE,
     h: BIRD_SIZE,
-    color: BIRD_COLORS[Math.floor(Math.random() * BIRD_COLORS.length)],
+    color:
+      BIRD_COLORS[Math.floor(Math.random() * BIRD_COLORS.length)],
     wingState: 0,
     wingDirection: 1,
   };
   pipes = [];
   // Add a pipe immediately at game start
   const top =
-    Math.floor(Math.random() * (groundY - currentPipeGap - PIPE_TOP_BUFFER)) + PIPE_TOP_MIN;
+    Math.floor(
+      Math.random() * (groundY - currentPipeGap - PIPE_TOP_BUFFER)
+    ) + PIPE_TOP_MIN;
   pipes.push({
     x: canvas.width,
     top,
@@ -159,6 +171,9 @@ function resetGame() {
   paused = false;
   currentPipeGap = BASE_PIPE_GAP;
   currentPipeSpeed = BASE_PIPE_SPEED;
+  PIPE_INTERVAL = Math.round(
+    DESIRED_PIPE_PIXEL_GAP / currentPipeSpeed
+  );
   lastJumpTime = 0;
   hideGameOver();
   updateHearts(lives);
@@ -187,6 +202,9 @@ function resetGameStateVars() {
   paused = false;
   currentPipeGap = BASE_PIPE_GAP;
   currentPipeSpeed = BASE_PIPE_SPEED;
+  PIPE_INTERVAL = Math.round(
+    DESIRED_PIPE_PIXEL_GAP / currentPipeSpeed
+  );
   lastJumpTime = 0;
 
   for (let i = 0; i < 3; i++) {
@@ -220,7 +238,10 @@ function update() {
   updateClouds(CLOUDS, canvas);
 
   // Use PARALLAX_LAYERS or PARALLAX_LAYERS_NIGHT based on score
-  const layers = score >= BuildingSizeIncreaseScore ? PARALLAX_LAYERS_NIGHT : PARALLAX_LAYERS;
+  const layers =
+    score >= BuildingSizeIncreaseScore
+      ? PARALLAX_LAYERS_NIGHT
+      : PARALLAX_LAYERS;
   updateParallax(layers, canvas);
   updateParticles(particles);
 
@@ -230,7 +251,13 @@ function update() {
     loseLife();
 
     for (let i = 0; i < 20; i++) {
-      particles.push(createParticle(bird.x + bird.w / 2, bird.y + bird.h, bird.color));
+      particles.push(
+        createParticle(
+          bird.x + bird.w / 2,
+          bird.y + bird.h,
+          bird.color
+        )
+      );
     }
     return;
   }
@@ -243,9 +270,12 @@ function update() {
 
   // Pipe generation
   if (frame % PIPE_INTERVAL === 0) {
-    const top = Math.floor(Math.random() * (groundY - currentPipeGap - 100)) + 50;
+    const top =
+      Math.floor(Math.random() * (groundY - currentPipeGap - 100)) +
+      50;
     // Randomly pick a color for the pipe (green, blue, gray, orange)
-    const color = PIPE_COLORS[Math.floor(Math.random() * PIPE_COLORS.length)];
+    const color =
+      PIPE_COLORS[Math.floor(Math.random() * PIPE_COLORS.length)];
     pipes.push({
       x: canvas.width,
       top,
@@ -264,44 +294,53 @@ function update() {
 
   // Collision detection
   if (invincibilityFrames > 0) {
-  invincibilityFrames--;
-}
-
-for (let pipe of pipes) {
-  const pipeEndMargin = -8; // Match the drawing code
-
-  // Top pipe rectangle (matches drawing)
-  const topPipeRect = {
-    x: pipe.x,
-    y: 0,
-    w: PIPE_WIDTH,
-    h: pipe.top - 18 - pipeEndMargin,
-  };
-
-  // Bottom pipe rectangle (matches drawing)
-  const bottomPipeRect = {
-    x: pipe.x,
-    y: pipe.top + currentPipeGap + 18 + pipeEndMargin,
-    w: PIPE_WIDTH,
-    h: groundY - (pipe.top + currentPipeGap + 18 + pipeEndMargin),
-  };
-
-  // Bird rectangle (shrink by 4px on all sides for a more forgiving collision)
-  const birdRect = {
-    x: bird.x + 2,
-    y: bird.y + 2,
-    w: bird.w - 4,
-    h: bird.h - 4,
-  };
-
-  function rectsOverlap(a, b) {
-    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    invincibilityFrames--;
   }
 
-  if (invincibilityFrames === 0 && (rectsOverlap(birdRect, topPipeRect) || rectsOverlap(birdRect, bottomPipeRect))) {
-    loseLife();
-    return;
-  }
+  for (let pipe of pipes) {
+    const pipeEndMargin = -8; // Match the drawing code
+
+    // Top pipe rectangle (matches drawing)
+    const topPipeRect = {
+      x: pipe.x,
+      y: 0,
+      w: PIPE_WIDTH,
+      h: pipe.top - 18 - pipeEndMargin,
+    };
+
+    // Bottom pipe rectangle (matches drawing)
+    const bottomPipeRect = {
+      x: pipe.x,
+      y: pipe.top + currentPipeGap + 18 + pipeEndMargin,
+      w: PIPE_WIDTH,
+      h: groundY - (pipe.top + currentPipeGap + 18 + pipeEndMargin),
+    };
+
+    // Bird rectangle (shrink by 4px on all sides for a more forgiving collision)
+    const birdRect = {
+      x: bird.x + 2,
+      y: bird.y + 2,
+      w: bird.w - 4,
+      h: bird.h - 4,
+    };
+
+    function rectsOverlap(a, b) {
+      return (
+        a.x < b.x + b.w &&
+        a.x + a.w > b.x &&
+        a.y < b.y + b.h &&
+        a.y + a.h > b.y
+      );
+    }
+
+    if (
+      invincibilityFrames === 0 &&
+      (rectsOverlap(birdRect, topPipeRect) ||
+        rectsOverlap(birdRect, bottomPipeRect))
+    ) {
+      loseLife();
+      return;
+    }
 
     // Scoring
     const pipeRight = pipe.x + PIPE_WIDTH;
@@ -338,7 +377,9 @@ function jump() {
   }
   // Jump particles
   for (let i = 0; i < 5; i++) {
-    particles.push(createParticle(bird.x + bird.w / 2, bird.y + bird.h, "#FFD700"));
+    particles.push(
+      createParticle(bird.x + bird.w / 2, bird.y + bird.h, "#FFD700")
+    );
   }
 }
 
@@ -367,12 +408,15 @@ function loseLife() {
     // --- Reset pipes like at game start ---
     pipes = [];
     const top =
-      Math.floor(Math.random() * (groundY - currentPipeGap - PIPE_TOP_BUFFER)) + PIPE_TOP_MIN;
+      Math.floor(
+        Math.random() * (groundY - currentPipeGap - PIPE_TOP_BUFFER)
+      ) + PIPE_TOP_MIN;
     pipes.push({
       x: canvas.width,
       top,
       passed: false,
-      color: PIPE_COLORS[Math.floor(Math.random() * PIPE_COLORS.length)],
+      color:
+        PIPE_COLORS[Math.floor(Math.random() * PIPE_COLORS.length)],
     });
 
     frame = 1;
@@ -457,6 +501,10 @@ function loop(now) {
 
 function startGame() {
   unlockAudio();
+
+  // Set pipe speed based on selected difficulty
+  BASE_PIPE_SPEED = getDifficultySettings();
+
   started = true;
   resetGame();
   hideStartScreen();
@@ -505,31 +553,102 @@ window.addEventListener("DOMContentLoaded", () => {
   // Setup controls (only once)
   setupControls(startGame, jump, togglePause, canvas);
 
-  // Add mouse, touch, pointer, and click support for jump
-  canvas.addEventListener("mousedown", jump);
+  // Setup custom difficulty dropdown
+  const difficultySelect = document.getElementById("difficulty");
+  const difficultyOptions = document.getElementById(
+    "difficultyOptions"
+  );
+
+  if (difficultySelect && difficultyOptions) {
+    // Toggle dropdown visibility
+    difficultySelect.addEventListener("click", function (e) {
+      console.log("Custom dropdown clicked");
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      const isVisible = difficultyOptions.classList.contains("show");
+      if (isVisible) {
+        difficultyOptions.classList.remove("show");
+      } else {
+        difficultyOptions.classList.add("show");
+      }
+    });
+
+    // Handle option selection
+    const options = difficultyOptions.querySelectorAll(
+      ".dropdown-option"
+    );
+    options.forEach((option) => {
+      option.addEventListener("click", function (e) {
+        console.log(
+          "Option selected:",
+          this.getAttribute("data-value")
+        );
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+
+        const value = this.getAttribute("data-value");
+        const text = this.textContent;
+
+        // Update the selected display
+        difficultySelect.textContent = text + " ▼";
+        difficultySelect.setAttribute("data-value", value);
+
+        // Hide options
+        difficultyOptions.classList.remove("show");
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function (e) {
+      if (
+        !difficultySelect.contains(e.target) &&
+        !difficultyOptions.contains(e.target)
+      ) {
+        difficultyOptions.classList.remove("show");
+      }
+    });
+
+    // Force the dropdown to be interactive
+    difficultySelect.style.pointerEvents = "auto";
+    difficultySelect.style.zIndex = "99999";
+    difficultySelect.style.position = "relative";
+  }
+
+  // Add mouse, touch, pointer, and click support for jump (but exclude dropdown)
+  canvas.addEventListener("mousedown", function (e) {
+    if (!e.target.closest("#difficultySelect")) jump();
+  });
   canvas.addEventListener(
     "touchstart",
     function (e) {
-      e.preventDefault();
-      jump();
+      if (!e.target.closest("#difficultySelect")) {
+        e.preventDefault();
+        jump();
+      }
     },
     { passive: false }
   );
   canvas.addEventListener(
     "pointerdown",
     function (e) {
-      e.preventDefault();
-      jump();
+      if (!e.target.closest("#difficultySelect")) {
+        e.preventDefault();
+        jump();
+      }
     },
     { passive: false }
   );
-  canvas.addEventListener("click", function () {
-    jump();
+  canvas.addEventListener("click", function (e) {
+    if (!e.target.closest("#difficultySelect")) jump();
   });
   document.addEventListener(
     "touchstart",
     function (e) {
-      if (e.target === canvas) {
+      if (
+        e.target === canvas &&
+        !e.target.closest("#difficultySelect")
+      ) {
         e.preventDefault();
         jump();
       }
@@ -539,13 +658,16 @@ window.addEventListener("DOMContentLoaded", () => {
   document.addEventListener(
     "pointerdown",
     function (e) {
-      e.preventDefault();
-      jump();
+      if (!e.target.closest("#difficultySelect")) {
+        e.preventDefault();
+        jump();
+      }
     },
     { passive: false }
   );
   document.addEventListener("click", function (e) {
-    if (e.target === canvas) jump();
+    if (e.target === canvas && !e.target.closest("#difficultySelect"))
+      jump();
   });
 
   // Attach Start button click event
@@ -560,11 +682,16 @@ window.addEventListener("DOMContentLoaded", () => {
 
   if (pauseBtn) {
     const newPauseBtn = pauseBtn.cloneNode(false); // clone without children
-    newPauseBtn.innerHTML = paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+    newPauseBtn.innerHTML = paused
+      ? '<i class="fas fa-play"></i>'
+      : '<i class="fas fa-pause"></i>';
     newPauseBtn.addEventListener("click", togglePause);
     newPauseBtn.setAttribute("tabindex", "0");
     newPauseBtn.setAttribute("aria-pressed", paused.toString());
-    newPauseBtn.setAttribute("aria-label", paused ? "Resume Game" : "Pause Game");
+    newPauseBtn.setAttribute(
+      "aria-label",
+      paused ? "Resume Game" : "Pause Game"
+    );
     pauseBtn.parentNode.replaceChild(newPauseBtn, pauseBtn);
   }
 
@@ -576,7 +703,10 @@ window.addEventListener("DOMContentLoaded", () => {
     newMuteBtn.addEventListener("click", toggleMute);
     newMuteBtn.setAttribute("tabindex", "0");
     newMuteBtn.setAttribute("aria-pressed", muted.toString());
-    newMuteBtn.setAttribute("aria-label", muted ? "Unmute Sound" : "Mute Sound");
+    newMuteBtn.setAttribute(
+      "aria-label",
+      muted ? "Unmute Sound" : "Mute Sound"
+    );
     muteBtn.parentNode.replaceChild(newMuteBtn, muteBtn);
     newMuteBtn.style.display = "none"; // keep as before
   }
@@ -589,12 +719,20 @@ window.addEventListener("DOMContentLoaded", () => {
       if (!paused && !gameOver) jump();
     }
     // Use e.code for reliability, but also check for active form elements
-    const tag = (document.activeElement && document.activeElement.tagName) || "";
-    if (e.code === "KeyP" && !["BUTTON", "INPUT", "TEXTAREA", "SELECT"].includes(tag)) {
+    const tag =
+      (document.activeElement && document.activeElement.tagName) ||
+      "";
+    if (
+      e.code === "KeyP" &&
+      !["BUTTON", "INPUT", "TEXTAREA", "SELECT"].includes(tag)
+    ) {
       e.preventDefault();
       togglePause();
     }
-    if (e.code === "KeyM" && !["BUTTON", "INPUT", "TEXTAREA", "SELECT"].includes(tag)) {
+    if (
+      e.code === "KeyM" &&
+      !["BUTTON", "INPUT", "TEXTAREA", "SELECT"].includes(tag)
+    ) {
       e.preventDefault();
       toggleMute();
     }
